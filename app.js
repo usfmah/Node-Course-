@@ -27,16 +27,35 @@ const server = http.createServer((req, res) => {
         return res.end();
     } 
     if (url === '/message' && method === 'POST') {
-        req.on( )
 
-        fs.writeFileSync('message.txt', 'Nada');
-        res.statusCode = 302;
-        res.setHeader('location', '/');
+        const body = [];
 
-        return res.end(); 
+        req.on('data', (chunk) => {
+
+            console.log(chunk);
+            body.push(chunk);
+
+        })
+
+        req.on('end', () => {
+
+            const parseBody = Buffer.concat(body).toString();
+            const message = parseBody.split('=')[1];
+
+            fs.writeFile('message.txt', message, (err) => {
+
+            res.statusCode = 302;
+            res.setHeader('location', '/');
+            return res.end(); 
+
+            });
+
+        });
+
+ 
     }
 
-    // Any other route
+    // Setting header and content type
     res.setHeader('Content-Type', 'text/html');
 
     res.write(`
